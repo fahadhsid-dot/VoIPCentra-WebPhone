@@ -186,7 +186,7 @@ foreach( $options_array as $value ) {
 
 if ( $layout == '' ) {
 	# layout is blank use the default
-	$layout = 'css/default.css';
+	$layout = 'css/voipcentra.css';
 } elseif ( preg_match('#^https?://#i', $layout) === 1 ) {
 	# layout begins with http:// or https:// so it is a link
 	# do nothing

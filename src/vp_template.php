@@ -41,7 +41,7 @@
 
 				<!-- Logo -->
 				<section id="logo">
-					<img id="logo_img" src="images/wp_logo.png">
+					<img id="logo_img" src="images/voipcentra-logo.svg">
 				</section>
 				<!-- End Logo -->
 
@@ -93,14 +93,18 @@
 				</section>
 				<!-- End Dialpad -->
 
-			</div>
+			<div id="vc-footer">
+<a href="https://voipcentra.net/" target="_blank" rel="noopener noreferrer">voipcentra.net</a>
+</div>
+</div>
 			<!-- End Main -->
 
 		</div>
 		<!-- End Container -->
 
 		<!-- Debug Output -->
-		<div id="debug"></div>
+
+<div id="debug"></div>
 
 		<!-- <?php echo "$options $settings"; ?> -->
 
