@@ -1,7 +1,7 @@
 <?php
 
 // Enable to enable the debug access log 
-$debug_access_log = true;
+$debug_access_log = false;
 
 // GET / POST Options
 // the phone login used as the auth_user
