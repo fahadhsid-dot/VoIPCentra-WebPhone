@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Test-only VoIPCentra transaction journal."""
 
+import fcntl
 import json
 import os
+import stat
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -99,59 +101,134 @@ def main():
     if state not in ALLOWED:
         raise RuntimeError("Invalid transaction state")
 
-    journal = root / (".voipcentra-transaction-" + tx_id + ".json")
+    # Serialize journal updates with an independent journal lock.
+    lock_path = root / ".voipcentra-journal.lock"
 
-    if journal.is_symlink():
-        raise RuntimeError("Journal symlink rejected")
+    if lock_path.is_symlink():
+        raise RuntimeError("Journal lock symlink rejected")
 
-    if journal.exists():
-        with journal.open("r") as handle:
-            previous = json.load(handle)
-
-        if previous.get("transaction_id") != tx_id:
-            raise RuntimeError("Transaction ID mismatch")
-
-        history = previous.get("history", [])
-        current = previous.get("current_state")
-
-        validate_history(history, current)
-    else:
-        history = []
-        current = None
-
-    if state not in TRANSITIONS.get(current, set()):
-        raise RuntimeError(
-            "Invalid state transition: {} -> {}".format(current, state)
-        )
-
-    history.append({
-        "state": state,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    })
-
-    data = {
-        "transaction_id": tx_id,
-        "current_state": state,
-        "history": history,
-    }
-
-    fd, temporary = tempfile.mkstemp(
-        prefix=".voipcentra-journal-",
-        dir=str(root)
-    )
+    # Reject symlinks during the open operation itself.
+    flags = os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW | os.O_CLOEXEC
+    lock_fd = os.open(str(lock_path), flags, 0o600)
 
     try:
-        with os.fdopen(fd, "w") as handle:
-            json.dump(data, handle, indent=2)
-            handle.flush()
-            os.fsync(handle.fileno())
+        info = os.fstat(lock_fd)
 
-        os.replace(temporary, str(journal))
+        if not stat.S_ISREG(info.st_mode):
+            raise RuntimeError("Journal lock is not a regular file")
+
+        if info.st_nlink != 1:
+            raise RuntimeError("Journal lock has unexpected hard links")
+
+        if info.st_uid != os.geteuid():
+            raise RuntimeError("Journal lock ownership mismatch")
+
+        if stat.S_IMODE(info.st_mode) & 0o077:
+            raise RuntimeError("Journal lock permissions too broad")
+
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (OSError, IOError):
+            raise RuntimeError("Journal lock unavailable")
+    except BaseException:
+        os.close(lock_fd)
+        raise
+
+    try:
+        journal = root / (".voipcentra-transaction-" + tx_id + ".json")
+
+        if journal.is_symlink():
+            raise RuntimeError("Journal symlink rejected")
+
+        if journal.exists():
+            journal_fd = os.open(
+                str(journal),
+                os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
+            )
+
+            with os.fdopen(journal_fd, "r") as handle:
+                journal_info = os.fstat(handle.fileno())
+
+                if not stat.S_ISREG(journal_info.st_mode):
+                    raise RuntimeError("Journal is not a regular file")
+
+                if journal_info.st_nlink != 1:
+                    raise RuntimeError("Journal has unexpected hard links")
+
+                if journal_info.st_uid != os.geteuid():
+                    raise RuntimeError("Journal ownership mismatch")
+
+                if stat.S_IMODE(journal_info.st_mode) & 0o077:
+                    raise RuntimeError("Journal permissions too broad")
+
+                previous = json.load(handle)
+
+            if previous.get("transaction_id") != tx_id:
+                raise RuntimeError("Transaction ID mismatch")
+
+            history = previous.get("history", [])
+            current = previous.get("current_state")
+
+            validate_history(history, current)
+        else:
+            history = []
+            current = None
+
+        if state not in TRANSITIONS.get(current, set()):
+            raise RuntimeError(
+                "Invalid state transition: {} -> {}".format(current, state)
+            )
+
+        history.append({
+            "state": state,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        })
+
+        data = {
+            "transaction_id": tx_id,
+            "current_state": state,
+            "history": history,
+        }
+
+        fd, temporary = tempfile.mkstemp(
+            prefix=".voipcentra-journal-",
+            dir=str(root)
+        )
+
+        try:
+            with os.fdopen(fd, "w") as handle:
+                json.dump(data, handle, indent=2)
+                handle.flush()
+                os.fsync(handle.fileno())
+
+            # Revalidate destination before atomic replacement.
+            if journal.is_symlink():
+                raise RuntimeError("Journal destination symlink rejected")
+
+            if journal.exists():
+                destination_info = os.lstat(str(journal))
+
+                if not stat.S_ISREG(destination_info.st_mode):
+                    raise RuntimeError("Journal destination not regular")
+
+                if destination_info.st_nlink != 1:
+                    raise RuntimeError("Journal destination hardlink rejected")
+
+                if destination_info.st_uid != os.geteuid():
+                    raise RuntimeError("Journal destination ownership mismatch")
+
+                if stat.S_IMODE(destination_info.st_mode) & 0o077:
+                    raise RuntimeError("Journal destination permissions too broad")
+
+            os.replace(temporary, str(journal))
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+        print("JOURNAL STATE:", state)
+
     finally:
-        if os.path.exists(temporary):
-            os.unlink(temporary)
-
-    print("JOURNAL STATE:", state)
+        os.close(lock_fd)
 
 
 if __name__ == "__main__":
