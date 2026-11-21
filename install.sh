@@ -80,6 +80,9 @@ case "$MODE" in
         ;;
 
     --install)
+        source "$SOURCE/scripts/deployment-lock.sh"
+        voipcentra_acquire_lock "$WEBROOT" || exit 1
+
         check
 
         if [[ -e "$TARGET" || -L "$TARGET" ]]; then
@@ -141,6 +144,10 @@ case "$MODE" in
         }
         echo "=== DUAL WEBPHONE PREFLIGHT ==="
 
+        # Shared lock inherited by both child installers.
+        source "$SOURCE/scripts/deployment-lock.sh"
+        voipcentra_acquire_lock "$WEBROOT" || exit 1
+
         PREMIUM_TARGET="$WEBROOT/VoIPCentra-WebPhone"
         ORIGINAL_TARGET="$WEBROOT/ViciPhone"
 
@@ -154,10 +161,15 @@ case "$MODE" in
             exit 1
         fi
 
-        [[ -d /tmp/ViciPhone-Original-3.0/.git ]] || {
-            echo "ERROR: Original ViciPhone source missing."
+        # Verify or fetch Original ViciPhone before deploying either phone.
+        # The path must match scripts/install-original-viciphone.sh.
+        ORIGINAL_SOURCE="/tmp/ViciPhone-Original-v2.2-Fresh"
+
+        if ! bash "$SOURCE/scripts/fetch-original-viciphone.sh" "$ORIGINAL_SOURCE"; then
+            echo "SAFETY STOP: Original ViciPhone source verification failed."
+            echo "No WebPhone deployment started."
             exit 1
-        }
+        fi
 
         echo "PREFLIGHT PASS: Both destinations available."
         echo "Installing VoIPCentra Premium..."

@@ -24,8 +24,13 @@ for tool in git php tar mktemp; do
     }
 done
 
-# Fetch or verify the exact approved upstream revision.
+# Acquire shared deployment lock before any source fetching.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "$SCRIPT_DIR/deployment-lock.sh"
+voipcentra_acquire_lock "$WEBROOT" || exit 1
+
+# Fetch or verify the exact approved upstream revision.
 
 bash "$SCRIPT_DIR/fetch-original-viciphone.sh" "$SOURCE" || {
     echo "ERROR: Original ViciPhone source verification failed."
