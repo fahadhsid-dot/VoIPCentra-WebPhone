@@ -80,6 +80,11 @@ case "$MODE" in
         ;;
 
     --install)
+        [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]] || {
+            echo "SAFETY STOP: Development installation is test-only."
+            exit 1
+        }
+
         PUBLISH_HELPER="$SOURCE/scripts/atomic-publish.py"
         PERMISSIONS_HELPER="$SOURCE/scripts/prepare-web-permissions.sh"
         source "$SOURCE/scripts/deployment-lock.sh"
