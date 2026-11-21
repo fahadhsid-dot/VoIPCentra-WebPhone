@@ -105,6 +105,13 @@ case "$MODE" in
         echo "VICIdial integration must be configured and tested separately."
         ;;
 
+    --check-vicidial)
+        check
+        echo
+        echo "=== VICIDIAL INTEGRATION ==="
+        bash "$SOURCE/scripts/check-vicidial-integration.sh"
+        ;;
+
     --backup)
         [[ -d "$TARGET" && ! -L "$TARGET" ]] || {
             echo "ERROR: Existing directory not found."
@@ -123,7 +130,7 @@ case "$MODE" in
         ;;
 
     *)
-        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install]"
+        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--check-vicidial]"
         exit 1
         ;;
 esac

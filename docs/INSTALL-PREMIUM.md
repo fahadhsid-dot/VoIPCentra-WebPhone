@@ -22,3 +22,11 @@ VICIdial database, SIP, WebRTC and AI bot configuration are separate.
 ## License
 
 Retain upstream ViciPhone AGPL license and copyright notices.
+
+## VICIdial integration check
+
+Run this read-only command to inspect the current WebPhone URL, enabled phone count and user-group URL overrides:
+
+    bash install.sh --check-vicidial
+
+This check does not modify the VICIdial database or SIP/WebRTC settings.
