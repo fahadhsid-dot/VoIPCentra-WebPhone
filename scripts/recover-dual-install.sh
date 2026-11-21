@@ -67,6 +67,65 @@ ACTUAL_TX="$(cat "$MARKER")"
     exit 1
 }
 
+# Require a valid FAILED transaction journal before moving files.
+python3 - "$ROOT" "$EXPECTED_TX" <<'JOURNAL_CHECK'
+import json
+import os
+import stat
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+tx = sys.argv[2]
+journal = root / (".voipcentra-transaction-" + tx + ".json")
+
+flags = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
+fd = os.open(str(journal), flags)
+
+with os.fdopen(fd, "r") as handle:
+    info = os.fstat(handle.fileno())
+
+    if not stat.S_ISREG(info.st_mode):
+        raise RuntimeError("Recovery journal is not regular")
+
+    if info.st_nlink != 1:
+        raise RuntimeError("Recovery journal hardlink rejected")
+
+    if info.st_uid != os.geteuid():
+        raise RuntimeError("Recovery journal owner mismatch")
+
+    if stat.S_IMODE(info.st_mode) & 0o077:
+        raise RuntimeError("Recovery journal permissions unsafe")
+
+    data = json.load(handle)
+
+expected = ["STARTED", "PREMIUM_INSTALLED", "FAILED"]
+
+if not isinstance(data, dict):
+    raise RuntimeError("Invalid recovery journal")
+
+if data.get("transaction_id") != tx:
+    raise RuntimeError("Recovery journal transaction mismatch")
+
+if data.get("current_state") != "FAILED":
+    raise RuntimeError("Recovery journal is not FAILED")
+
+history = data.get("history")
+
+if not isinstance(history, list):
+    raise RuntimeError("Invalid recovery history")
+
+if any(not isinstance(entry, dict) for entry in history):
+    raise RuntimeError("Invalid recovery history entry")
+
+states = [entry.get("state") for entry in history]
+
+if states != expected:
+    raise RuntimeError("Recovery journal history mismatch")
+
+print("PASS: FAILED transaction journal verified")
+JOURNAL_CHECK
+
 echo "PASS: Recovery transaction verified."
 
 RECOVERY="$ROOT/.voipcentra-recovery-$(date +%Y%m%d-%H%M%S)-$$"
