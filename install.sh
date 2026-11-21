@@ -20,6 +20,18 @@ fi
 BACKUP_DIR="/root/VoIPCentra-Backups"
 MODE="${1:---check}"
 
+# Acquire a secure shared lock before entering installation modes.
+# Child installers inherit the verified FD 9.
+if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" &&
+      "${VOIPCENTRA_LOCK_INHERITED:-}" != "1" ]]; then
+    case "$MODE" in
+        --install|--install-voipcentra|--install-original|--install-both)
+            exec python3 "$SOURCE/scripts/secure-deployment-lock.py" \
+                "$WEBROOT" bash "$SOURCE/install.sh" "$@"
+            ;;
+    esac
+fi
+
 check() {
     echo "=== VoIPCentra WebPhone Preflight ==="
 

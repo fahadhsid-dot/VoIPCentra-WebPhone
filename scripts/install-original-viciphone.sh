@@ -27,6 +27,12 @@ done
 # Acquire shared deployment lock before any source fetching.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" &&
+      "${VOIPCENTRA_LOCK_INHERITED:-}" != "1" ]]; then
+    exec python3 "$SCRIPT_DIR/secure-deployment-lock.py" \
+        "$WEBROOT" bash "$SCRIPT_DIR/install-original-viciphone.sh" "$@"
+fi
+
 PUBLISH_HELPER="$SCRIPT_DIR/atomic-publish.py"
 PERMISSIONS_HELPER="$SCRIPT_DIR/prepare-web-permissions.sh"
 source "$SCRIPT_DIR/deployment-lock.sh"
