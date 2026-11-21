@@ -116,6 +116,19 @@ case "$MODE" in
             exit 1
         fi
 
+        # Transaction markers are permitted only in isolated test mode.
+        if [[ -n "${VOIPCENTRA_TRANSACTION_ID:-}" ]]; then
+            [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" &&
+               "$VOIPCENTRA_TRANSACTION_ID" =~ ^[0-9a-f]{32}$ ]] || {
+                echo "SAFETY STOP: Invalid deployment transaction."
+                exit 1
+            }
+
+            printf '%s\n' "$VOIPCENTRA_TRANSACTION_ID" > "$STAGING/.voipcentra-transaction-id"
+
+            echo "PASS: Premium transaction marker prepared."
+        fi
+
         bash "$PERMISSIONS_HELPER" "$STAGING"
         python3 "$PUBLISH_HELPER" "$STAGING" "$TARGET"
         trap - EXIT
@@ -174,6 +187,11 @@ case "$MODE" in
             exit 1
         fi
 
+        # Unique identifier for this isolated dual-install transaction.
+        VOIPCENTRA_TRANSACTION_ID="$(python3 -c 'import uuid; print(uuid.uuid4().hex)')"
+        export VOIPCENTRA_TRANSACTION_ID
+
+        echo "TRANSACTION ID: $VOIPCENTRA_TRANSACTION_ID"
         echo "PREFLIGHT PASS: Both destinations available."
         echo "Installing VoIPCentra Premium..."
         bash "$SOURCE/install.sh" --install
