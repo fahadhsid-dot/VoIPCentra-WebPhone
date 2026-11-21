@@ -178,6 +178,15 @@ case "$MODE" in
         echo "Installing VoIPCentra Premium..."
         bash "$SOURCE/install.sh" --install
 
+        # Test-only simulated failure after Premium deployment.
+        # Never permitted outside isolated test mode.
+        if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" &&
+              "${VOIPCENTRA_TEST_FAIL_ORIGINAL:-}" == "1" ]]; then
+            echo "SIMULATED FAILURE: Original deployment deliberately stopped."
+            echo "PARTIAL INSTALLATION: Premium may already be deployed."
+            exit 77
+        fi
+
         echo "Installing Original ViciPhone 3.0..."
         bash "$SOURCE/scripts/install-original-viciphone.sh"
 
