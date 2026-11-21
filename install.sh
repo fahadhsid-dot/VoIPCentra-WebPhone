@@ -7,7 +7,7 @@ TARGET="$WEBROOT/VoIPCentra-WebPhone"
 
 # Explicitly supported isolated test directory only
 if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]]; then
-    WEBROOT="/tmp/voipcentra-installer-test-v2"
+    WEBROOT="/tmp/voipcentra-dual-v2.1-test"
     TARGET="$WEBROOT/VoIPCentra-WebPhone"
 fi
 BACKUP_DIR="/root/VoIPCentra-Backups"
@@ -109,6 +109,57 @@ case "$MODE" in
 
         echo "INSTALLATION COMPLETE: $TARGET"
         echo "VICIdial integration must be configured and tested separately."
+        ;;
+
+    --install-voipcentra)
+        [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]] || {
+            echo "SAFETY STOP: Dual installer development is test-only."
+            exit 1
+        }
+        bash "$SOURCE/install.sh" --install
+        ;;
+
+    --install-original)
+        [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]] || {
+            echo "SAFETY STOP: Original installation is test-only."
+            exit 1
+        }
+        bash "$SOURCE/scripts/install-original-viciphone.sh"
+        ;;
+
+    --install-both)
+        [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]] || {
+            echo "SAFETY STOP: Dual installation is test-only."
+            exit 1
+        }
+        echo "=== DUAL WEBPHONE PREFLIGHT ==="
+
+        PREMIUM_TARGET="$WEBROOT/VoIPCentra-WebPhone"
+        ORIGINAL_TARGET="/tmp/voipcentra-dual-v2.1-test/ViciPhone"
+
+        if [[ -e "$PREMIUM_TARGET" || -L "$PREMIUM_TARGET" ]]; then
+            echo "SAFETY STOP: Premium installation already exists."
+            exit 1
+        fi
+
+        if [[ -e "$ORIGINAL_TARGET" || -L "$ORIGINAL_TARGET" ]]; then
+            echo "SAFETY STOP: Original installation already exists."
+            exit 1
+        fi
+
+        [[ -d /tmp/ViciPhone-Original-3.0/.git ]] || {
+            echo "ERROR: Original ViciPhone source missing."
+            exit 1
+        }
+
+        echo "PREFLIGHT PASS: Both destinations available."
+        echo "Installing VoIPCentra Premium..."
+        bash "$SOURCE/install.sh" --install
+
+        echo "Installing Original ViciPhone 3.0..."
+        bash "$SOURCE/scripts/install-original-viciphone.sh"
+
+        echo "DUAL INSTALLATION COMPLETE"
         ;;
 
     --check-compatibility)
