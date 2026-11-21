@@ -39,7 +39,8 @@ def main():
     if (
         root.parent != Path("/tmp")
         or not root.name.startswith("voipcentra-dual-")
-        or not root.name[len("voipcentra-dual-"):].replace("-", "").replace("_", "").isalnum()
+        or not root.name[len("voipcentra-dual-"):].replace("-", "").replace("_", "").replace(".", "").isalnum()
+        or ".." in root.name
     ):
         raise RuntimeError("Invalid test root")
 
