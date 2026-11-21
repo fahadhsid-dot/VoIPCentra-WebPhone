@@ -7,7 +7,14 @@ TARGET="$WEBROOT/VoIPCentra-WebPhone"
 
 # Explicitly supported isolated test directory only
 if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]]; then
-    WEBROOT="/tmp/voipcentra-dual-v2.2-test"
+    WEBROOT="${VOIPCENTRA_TEST_ROOT:-/tmp/voipcentra-dual-v2.2-test}"
+
+    if [[ ! "$WEBROOT" =~ ^/tmp/voipcentra-dual-[A-Za-z0-9._-]+$ ||
+          -L "$WEBROOT" ]]; then
+        echo "SAFETY STOP: Invalid isolated test directory."
+        exit 1
+    fi
+
     TARGET="$WEBROOT/VoIPCentra-WebPhone"
 fi
 BACKUP_DIR="/root/VoIPCentra-Backups"
@@ -135,7 +142,7 @@ case "$MODE" in
         echo "=== DUAL WEBPHONE PREFLIGHT ==="
 
         PREMIUM_TARGET="$WEBROOT/VoIPCentra-WebPhone"
-        ORIGINAL_TARGET="/tmp/voipcentra-dual-v2.2-test/ViciPhone"
+        ORIGINAL_TARGET="$WEBROOT/ViciPhone"
 
         if [[ -e "$PREMIUM_TARGET" || -L "$PREMIUM_TARGET" ]]; then
             echo "SAFETY STOP: Premium installation already exists."

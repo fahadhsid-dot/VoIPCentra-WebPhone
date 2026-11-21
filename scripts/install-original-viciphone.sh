@@ -5,14 +5,17 @@ set -euo pipefail
 # Development version: isolated test installation only.
 
 SOURCE="/tmp/ViciPhone-Original-v2.2-Fresh"
-WEBROOT="/tmp/voipcentra-dual-v2.2-test"
+WEBROOT="${VOIPCENTRA_TEST_ROOT:-/tmp/voipcentra-dual-v2.2-test}"
 TARGET="$WEBROOT/ViciPhone"
 EXPECTED_COMMIT="24e98fccfa7b7079fff970e02fca5f002ac1f2cc"
 
 echo "=== ORIGINAL VICIPHONE 3.0 INSTALLER ==="
 
 # Production deployment deliberately disabled in this stage.
-[[ "$WEBROOT" == "/tmp/voipcentra-dual-v2.2-test" ]] || exit 1
+[[ "$WEBROOT" =~ ^/tmp/voipcentra-dual-[A-Za-z0-9._-]+$ && ! -L "$WEBROOT" ]] || {
+    echo "SAFETY STOP: Invalid isolated test directory."
+    exit 1
+}
 
 for tool in git php tar mktemp; do
     command -v "$tool" >/dev/null || {
