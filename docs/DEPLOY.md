@@ -1,3 +1,20 @@
+## Credential and access logging security
+
+VoIPCentra Premium v3.0 disables application-level debug
+access logging by default in `src/viciphone.php`.
+
+This change does not disable Apache access logs and does not
+eliminate the risk of SIP credentials appearing in URLs.
+
+The inherited ViciPhone interface accepts Base64-encoded SIP
+credentials via GET or POST. Base64 is not encryption.
+
+Before production deployment, review credential transport,
+web-server request logging, HTTPS, browser access, and
+VICIdial integration.
+
+Original ViciPhone upstream files remain unmodified.
+
 # VoIPCentra v3.0 - Development Deployment Notice
 
 **Universal Installer v2.9 DEV - NOT PRODUCTION READY.**
