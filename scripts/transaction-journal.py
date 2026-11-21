@@ -25,6 +25,52 @@ TRANSITIONS = {
     "FAILED": set(),
 }
 
+
+def validate_history(history, current):
+    if not isinstance(history, list):
+        raise RuntimeError("Invalid journal history")
+
+    previous = None
+
+    for entry in history:
+        if not isinstance(entry, dict):
+            raise RuntimeError("Invalid history entry")
+
+        state = entry.get("state")
+        timestamp = entry.get("timestamp")
+
+        if state not in TRANSITIONS.get(previous, set()):
+            raise RuntimeError("Invalid stored state transition")
+
+        if not isinstance(timestamp, str):
+            raise RuntimeError("Invalid history timestamp")
+
+        import re
+
+        pattern = (
+            r"^\d{4}-\d{2}-\d{2}T"
+            r"\d{2}:\d{2}:\d{2}"
+            r"(?:\.\d{1,6})?\+00:00$"
+        )
+
+        if not re.fullmatch(pattern, timestamp):
+            raise RuntimeError("Invalid history timestamp")
+
+        try:
+            datetime.strptime(
+                timestamp,
+                "%Y-%m-%dT%H:%M:%S.%f+00:00"
+                if "." in timestamp else
+                "%Y-%m-%dT%H:%M:%S+00:00"
+            )
+        except ValueError:
+            raise RuntimeError("Invalid history timestamp")
+
+        previous = state
+
+    if previous != current:
+        raise RuntimeError("Journal state/history mismatch")
+
 def main():
     if len(sys.argv) != 4:
         raise RuntimeError("Usage: transaction-journal.py ROOT TX_ID STATE")
@@ -68,8 +114,7 @@ def main():
         history = previous.get("history", [])
         current = previous.get("current_state")
 
-        if not isinstance(history, list):
-            raise RuntimeError("Invalid journal history")
+        validate_history(history, current)
     else:
         history = []
         current = None
