@@ -27,6 +27,7 @@ done
 # Acquire shared deployment lock before any source fetching.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+PUBLISH_HELPER="$SCRIPT_DIR/atomic-publish.py"
 source "$SCRIPT_DIR/deployment-lock.sh"
 voipcentra_acquire_lock "$WEBROOT" || exit 1
 
@@ -79,7 +80,7 @@ fi
 
 # Stage on the same filesystem, then publish without
 # copying partially prepared files into the destination.
-mv -T -- "$STAGING" "$TARGET"
+python3 "$PUBLISH_HELPER" "$STAGING" "$TARGET"
 trap - EXIT
 
 echo "INSTALLATION COMPLETE: $TARGET"

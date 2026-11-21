@@ -80,6 +80,7 @@ case "$MODE" in
         ;;
 
     --install)
+        PUBLISH_HELPER="$SOURCE/scripts/atomic-publish.py"
         source "$SOURCE/scripts/deployment-lock.sh"
         voipcentra_acquire_lock "$WEBROOT" || exit 1
 
@@ -114,7 +115,7 @@ case "$MODE" in
             exit 1
         fi
 
-        mv -T -- "$STAGING" "$TARGET"
+        python3 "$PUBLISH_HELPER" "$STAGING" "$TARGET"
         trap - EXIT
 
         echo "INSTALLATION COMPLETE: $TARGET"
