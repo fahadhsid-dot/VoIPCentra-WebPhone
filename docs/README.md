@@ -1,3 +1,5 @@
+> **VoIPCentra Premium v1.0:** This document contains legacy starter instructions. For current installation instructions, see [INSTALL-PREMIUM.md](INSTALL-PREMIUM.md). Do not use the retired theme installer to deploy Premium v1.0.
+
 # VoIPCentra WebPhone — starter v0.2
 
 A **theme-first** custom VICIdial/ViciPhone project. This package includes **branding/theme assets, a preview, and an installer**; it does **not** contain the upstream ViciPhone code or a complete reimplemented dialer.

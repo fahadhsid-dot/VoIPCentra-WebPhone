@@ -1,3 +1,5 @@
+> **VoIPCentra Premium v1.0:** This document contains legacy starter instructions. For current installation instructions, see [INSTALL-PREMIUM.md](docs/INSTALL-PREMIUM.md). Do not use the retired theme installer to deploy Premium v1.0.
+
 # Viciphone Version 3.0
 
 With this release comes the following improvements:

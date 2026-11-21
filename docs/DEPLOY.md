@@ -1,3 +1,5 @@
+> **VoIPCentra Premium v1.0:** This document contains legacy starter instructions. For current installation instructions, see [INSTALL-PREMIUM.md](INSTALL-PREMIUM.md). Do not use the retired theme installer to deploy Premium v1.0.
+
 # Safe deployment and validation
 
 1. Back up relevant VICIdial configuration, and work on **staging** first.
