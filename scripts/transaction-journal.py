@@ -221,6 +221,17 @@ def main():
                     raise RuntimeError("Journal destination permissions too broad")
 
             os.replace(temporary, str(journal))
+
+            # Persist the directory entry after atomic replacement.
+            dir_flags = (
+                os.O_RDONLY | os.O_DIRECTORY |
+                os.O_NOFOLLOW | os.O_CLOEXEC
+            )
+            dir_fd = os.open(str(root), dir_flags)
+            try:
+                os.fsync(dir_fd)
+            finally:
+                os.close(dir_fd)
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)
