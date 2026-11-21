@@ -191,22 +191,43 @@ case "$MODE" in
         VOIPCENTRA_TRANSACTION_ID="$(python3 -c 'import uuid; print(uuid.uuid4().hex)')"
         export VOIPCENTRA_TRANSACTION_ID
 
+        JOURNAL_HELPER="$SOURCE/scripts/transaction-journal.py"
+
+        journal_state() {
+            VOIPCENTRA_TEST_MODE=1 python3 "$JOURNAL_HELPER"                 "$WEBROOT" "$VOIPCENTRA_TRANSACTION_ID" "$1"
+        }
+
         echo "TRANSACTION ID: $VOIPCENTRA_TRANSACTION_ID"
+        journal_state STARTED || exit 1
         echo "PREFLIGHT PASS: Both destinations available."
         echo "Installing VoIPCentra Premium..."
-        bash "$SOURCE/install.sh" --install
+        if ! bash "$SOURCE/install.sh" --install; then
+            journal_state FAILED || true
+            echo "DUAL INSTALL FAILED: Premium deployment."
+            exit 1
+        fi
+
+        journal_state PREMIUM_INSTALLED || exit 1
 
         # Test-only simulated failure after Premium deployment.
         # Never permitted outside isolated test mode.
         if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" &&
               "${VOIPCENTRA_TEST_FAIL_ORIGINAL:-}" == "1" ]]; then
             echo "SIMULATED FAILURE: Original deployment deliberately stopped."
+            journal_state FAILED || true
             echo "PARTIAL INSTALLATION: Premium may already be deployed."
             exit 77
         fi
 
         echo "Installing Original ViciPhone 3.0..."
-        bash "$SOURCE/scripts/install-original-viciphone.sh"
+        if ! bash "$SOURCE/scripts/install-original-viciphone.sh"; then
+            journal_state FAILED || true
+            echo "DUAL INSTALL FAILED: Original deployment."
+            exit 1
+        fi
+
+        journal_state ORIGINAL_INSTALLED || exit 1
+        journal_state COMPLETE || exit 1
 
         echo "DUAL INSTALLATION COMPLETE"
         ;;
