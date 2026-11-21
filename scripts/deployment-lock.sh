@@ -17,6 +17,29 @@ voipcentra_acquire_lock() {
         return 1
     }
 
+    # Validate the deployment root for fresh and inherited locks.
+    # Reject roots writable by group or other users.
+    voipcentra_validate_deployment_root() {
+        local root_path="$1"
+        local metadata kind owner mode
+
+        [[ -d "$root_path" && ! -L "$root_path" ]] || return 1
+
+        metadata="$(stat -Lc '%F|%u|%a' -- "$root_path")" || return 1
+        IFS='|' read -r kind owner mode <<< "$metadata"
+
+        [[ "$kind" == "directory" ]] || return 1
+        [[ "$owner" == "$(id -u)" ]] || return 1
+        [[ "$mode" =~ ^[0-7]{3,4}$ ]] || return 1
+
+        (( (8#$mode & 8#22) == 0 )) || return 1
+    }
+
+    if ! voipcentra_validate_deployment_root "$root"; then
+        echo "SAFETY STOP: Deployment root ownership or permissions invalid."
+        return 1
+    fi
+
     # Validate the actual opened lock descriptor.
     voipcentra_validate_lock_fd() {
         local fd="$1"
