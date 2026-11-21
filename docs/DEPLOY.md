@@ -1,8 +1,35 @@
+# VoIPCentra v3.0 - Development Deployment Notice
+
+**Universal Installer v2.9 DEV - NOT PRODUCTION READY.**
+
+Premium, Original and Both modes passed isolated ViciBox 12
+installation, locking, failure and recovery tests.
+
+Production installation remains disabled.
+
+Existing instructions below include legacy staging guidance.
+Do not use retired theme installers or deploy this development
+branch directly over an existing production WebPhone.
+
+All installation modes require VOIPCENTRA_TEST_MODE=1
+and an isolated /tmp/voipcentra-dual-* directory.
+
+Real SIP/WebRTC calls, codecs, browser interoperability
+and other ViciBox versions remain unverified.
+
+---
+
 > **VoIPCentra Universal Installer v2.9 DEV:** Premium, Original ViciPhone 3.0, and dual installation have passed isolated ViciBox 12 tests. Original and dual installation modes remain test-only. Manual recovery is test-only, production integration requires separate verification, and compatibility with other ViciBox versions is not yet established. Do not use these development installation workflows against a production VICIdial system.
 
 > **VoIPCentra Premium v1.0:** This document contains legacy starter instructions. For current installation instructions, see [INSTALL-PREMIUM.md](INSTALL-PREMIUM.md). Do not use the retired theme installer to deploy Premium v1.0.
 
 # Safe deployment and validation
+
+## Legacy deployment instructions — NOT FOR CURRENT INSTALLER
+
+**WARNING:** The following steps describe a retired theme-first workflow. Do not run them against production or use them as installation instructions for Universal Installer v2.9 DEV.
+
+
 
 1. Back up relevant VICIdial configuration, and work on **staging** first.
 2. Confirm that existing original ViciPhone works, including SIP registration and calls.
