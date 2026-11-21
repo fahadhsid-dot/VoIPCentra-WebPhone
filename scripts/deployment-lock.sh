@@ -17,12 +17,34 @@ voipcentra_acquire_lock() {
         return 1
     }
 
+    # Validate the actual opened lock descriptor.
+    voipcentra_validate_lock_fd() {
+        local fd="$1"
+        local metadata kind owner mode links
+
+        metadata="$(stat -Lc '%F|%u|%a|%h' "/proc/self/fd/$fd")" || return 1
+        IFS='|' read -r kind owner mode links <<< "$metadata"
+
+        [[ "$kind" == "regular file" ||
+           "$kind" == "regular empty file" ]] || return 1
+        [[ "$owner" == "$(id -u)" ]] || return 1
+        [[ "$links" == "1" ]] || return 1
+        [[ "$mode" =~ ^[0-7]{3,4}$ ]] || return 1
+
+        (( (8#$mode & 8#77) == 0 )) || return 1
+    }
+
     # A child installer inherits the parent's locked descriptor.
     # Only trust the inherited descriptor when it references
     # the expected lock file and the current process holds its lock.
     if [[ "${VOIPCENTRA_LOCK_INHERITED:-}" == "1" ]]; then
         if [[ -e "/proc/self/fd/9" ]] &&
            [[ "$(readlink -f /proc/self/fd/9)" == "$(readlink -f "$lock_file")" ]]; then
+            if ! voipcentra_validate_lock_fd 9; then
+                echo "SAFETY STOP: Inherited lock metadata invalid."
+                return 1
+            fi
+
             # Recheck flock on the inherited file description.
             # A forged environment flag alone must not bypass locking.
             if flock -n 9; then
@@ -46,6 +68,12 @@ voipcentra_acquire_lock() {
     }
 
     exec 9>>"$lock_file"
+
+    if ! voipcentra_validate_lock_fd 9; then
+        echo "SAFETY STOP: Deployment lock metadata invalid."
+        exec 9>&-
+        return 1
+    fi
 
     if ! flock -n 9; then
         echo "SAFETY STOP: Another deployment is running."
