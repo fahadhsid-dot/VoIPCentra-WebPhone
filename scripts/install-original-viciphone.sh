@@ -7,7 +7,7 @@ set -euo pipefail
 SOURCE="/tmp/ViciPhone-Original-3.0"
 WEBROOT="/tmp/voipcentra-dual-v2.1-test"
 TARGET="$WEBROOT/ViciPhone"
-EXPECTED_COMMIT="24e98fc"
+EXPECTED_COMMIT="24e98fccfa7b7079fff970e02fca5f002ac1f2cc"
 
 echo "=== ORIGINAL VICIPHONE 3.0 INSTALLER ==="
 
@@ -21,12 +21,15 @@ for tool in git php tar mktemp; do
     }
 done
 
-[[ -d "$SOURCE/.git" ]] || {
-    echo "ERROR: Original ViciPhone source missing."
+# Fetch or verify the exact approved upstream revision.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+bash "$SCRIPT_DIR/fetch-original-viciphone.sh" "$SOURCE" || {
+    echo "ERROR: Original ViciPhone source verification failed."
     exit 1
 }
 
-COMMIT="$(git -C "$SOURCE" rev-parse --short=7 HEAD)"
+COMMIT="$(git -C "$SOURCE" rev-parse HEAD)"
 
 [[ "$COMMIT" == "$EXPECTED_COMMIT" ]] || {
     echo "ERROR: Unexpected original source revision."
