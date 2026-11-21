@@ -169,6 +169,10 @@ case "$MODE" in
         echo "DUAL INSTALLATION COMPLETE"
         ;;
 
+    --menu)
+        bash "$SOURCE/scripts/installer-menu.sh"
+        ;;
+
     --check-compatibility)
         echo "=== UNIVERSAL SERVER COMPATIBILITY ==="
         bash "$SOURCE/scripts/check-server-compatibility.sh"
@@ -199,7 +203,7 @@ case "$MODE" in
         ;;
 
     *)
-        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--check-vicidial|--check-compatibility]"
+        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--check-vicidial|--check-compatibility|--menu]"
         exit 1
         ;;
 esac
