@@ -2,6 +2,12 @@
 set -euo pipefail
 
 ROOT="${1:-}"
+EXPECTED_TX="${2:-}"
+
+[[ "$EXPECTED_TX" =~ ^[0-9a-f]{32}$ ]] || {
+    echo "SAFETY STOP: Valid transaction ID required."
+    exit 1
+}
 
 # Manual recovery remains strictly test-only.
 [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]] || {
@@ -46,6 +52,22 @@ ORIGINAL="$ROOT/ViciPhone"
     echo "SAFETY STOP: Premium installation incomplete."
     exit 1
 }
+
+MARKER="$PREMIUM/.voipcentra-transaction-id"
+
+[[ -f "$MARKER" && ! -L "$MARKER" ]] || {
+    echo "SAFETY STOP: Transaction marker missing."
+    exit 1
+}
+
+ACTUAL_TX="$(cat "$MARKER")"
+
+[[ "$ACTUAL_TX" == "$EXPECTED_TX" ]] || {
+    echo "SAFETY STOP: Transaction ID mismatch."
+    exit 1
+}
+
+echo "PASS: Recovery transaction verified."
 
 RECOVERY="$ROOT/.voipcentra-recovery-$(date +%Y%m%d-%H%M%S)-$$"
 
