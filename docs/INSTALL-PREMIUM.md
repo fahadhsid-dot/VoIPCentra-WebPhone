@@ -30,3 +30,9 @@ Run this read-only command to inspect the current WebPhone URL, enabled phone co
     bash install.sh --check-vicidial
 
 This check does not modify the VICIdial database or SIP/WebRTC settings.
+
+## Universal compatibility check v2.0
+
+Run: bash install.sh --check-compatibility
+
+Reports ViciBox release, PHP, Asterisk, SIP modules and active channel technologies. Detection does not certify versions 9-13 or modify server configuration.

@@ -7,7 +7,7 @@ TARGET="$WEBROOT/VoIPCentra-WebPhone"
 
 # Explicitly supported isolated test directory only
 if [[ "${VOIPCENTRA_TEST_MODE:-}" == "1" ]]; then
-    WEBROOT="/tmp/voipcentra-installer-test-final"
+    WEBROOT="/tmp/voipcentra-installer-test-v2"
     TARGET="$WEBROOT/VoIPCentra-WebPhone"
 fi
 BACKUP_DIR="/root/VoIPCentra-Backups"
@@ -85,10 +85,16 @@ case "$MODE" in
         STAGING="$(mktemp -d "$WEBROOT/.voipcentra-install.XXXXXXXX")"
         trap 'rm -rf -- "$STAGING"' EXIT
 
-        tar -C "$SOURCE" \
-            --exclude=.git \
-            --exclude='install.sh.phase*.bak' \
-            -cf - . | tar -C "$STAGING" -xf -
+        # Install tracked repository files only.
+        # Refuse dirty source changes to avoid deploying an unreviewed mix.
+        if [[ -n "$(git -C "$SOURCE" status --porcelain --untracked-files=no)" ]]; then
+            echo "ERROR: Tracked source files have uncommitted changes."
+            echo "Commit or restore changes before installation."
+            exit 1
+        fi
+
+        git -C "$SOURCE" archive --format=tar HEAD |
+            tar -C "$STAGING" -xf -
 
         php -l "$STAGING/src/viciphone.php"
         php -l "$STAGING/src/vp_template.php"
@@ -103,6 +109,11 @@ case "$MODE" in
 
         echo "INSTALLATION COMPLETE: $TARGET"
         echo "VICIdial integration must be configured and tested separately."
+        ;;
+
+    --check-compatibility)
+        echo "=== UNIVERSAL SERVER COMPATIBILITY ==="
+        bash "$SOURCE/scripts/check-server-compatibility.sh"
         ;;
 
     --check-vicidial)
@@ -130,7 +141,7 @@ case "$MODE" in
         ;;
 
     *)
-        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--check-vicidial]"
+        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--check-vicidial|--check-compatibility]"
         exit 1
         ;;
 esac
