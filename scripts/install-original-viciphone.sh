@@ -28,6 +28,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 PUBLISH_HELPER="$SCRIPT_DIR/atomic-publish.py"
+PERMISSIONS_HELPER="$SCRIPT_DIR/prepare-web-permissions.sh"
 source "$SCRIPT_DIR/deployment-lock.sh"
 voipcentra_acquire_lock "$WEBROOT" || exit 1
 
@@ -80,6 +81,7 @@ fi
 
 # Stage on the same filesystem, then publish without
 # copying partially prepared files into the destination.
+bash "$PERMISSIONS_HELPER" "$STAGING"
 python3 "$PUBLISH_HELPER" "$STAGING" "$TARGET"
 trap - EXIT
 
