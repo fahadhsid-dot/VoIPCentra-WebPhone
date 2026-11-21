@@ -1,3 +1,5 @@
+> **VoIPCentra Universal Installer v2.9 DEV:** Premium, Original ViciPhone 3.0, and dual installation have passed isolated ViciBox 12 tests. Original and dual installation modes remain test-only. Manual recovery is test-only, production integration requires separate verification, and compatibility with other ViciBox versions is not yet established. Do not use these development installation workflows against a production VICIdial system.
+
 > **VoIPCentra Premium v1.0:** This document contains legacy starter instructions. For current installation instructions, see [INSTALL-PREMIUM.md](docs/INSTALL-PREMIUM.md). Do not use the retired theme installer to deploy Premium v1.0.
 
 # Viciphone Version 3.0

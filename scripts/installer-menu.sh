@@ -7,7 +7,7 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo
 echo "========================================"
 echo "      VoIPCentra Universal Installer"
-echo "                v2.4 DEV"
+echo "                v2.9 DEV"
 echo "========================================"
 echo
 echo "1) Install VoIPCentra Premium"

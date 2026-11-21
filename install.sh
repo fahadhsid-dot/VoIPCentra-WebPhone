@@ -266,7 +266,8 @@ case "$MODE" in
         ;;
 
     *)
-        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--check-vicidial|--check-compatibility|--menu]"
+        echo "Usage: bash install.sh [--check|--dry-run|--backup|--install|--install-voipcentra|--install-original|--install-both|--check-vicidial|--check-compatibility|--menu]"
+        echo "NOTE: Original and dual installation modes are test-only."
         exit 1
         ;;
 esac
