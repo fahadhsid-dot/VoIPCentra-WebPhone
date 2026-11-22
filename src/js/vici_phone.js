@@ -195,6 +195,13 @@ function initialize() {
 	// set the reg status variable
 	uiElements.reg_status.value = lang.init;
 
+	// Do not initialize SIP.js without a valid WebSocket endpoint.
+	if (typeof ws_server !== "string" ||
+		!/^wss?:\/\/[^/\s]+/i.test(ws_server.trim())) {
+		uiElements.reg_status.value = "Configuration required: WebSocket URL missing";
+		return;
+	}
+
 	myUserAgent = new SIP.UserAgent(myUserAgentConfig);
 	myUserAgent.start()
 		.then(() => {
