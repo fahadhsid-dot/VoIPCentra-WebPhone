@@ -235,7 +235,8 @@ function initialize() {
 
 		})
 		.catch((error) => {
-			console.error("Failed to start myUserAgent " + error.message);
+			uiElements.reg_status.value = "Connection failed";
+			console.error("Failed to start myUserAgent");
 		});
 };
 
