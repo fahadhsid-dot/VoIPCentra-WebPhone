@@ -1,4 +1,15 @@
 <?php
+// Require an authenticated HTTPS transport before processing launch parameters.
+require_once __DIR__ . '/https-security.php';
+if (!voipcentra_is_https_request($_SERVER)) {
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=UTF-8');
+    header('Cache-Control: no-store');
+    echo 'VoIPCentra WebPhone requires a secure HTTPS connection.';
+    exit;
+}
+
+
 
 // Enable to enable the debug access log 
 $debug_access_log = false;
