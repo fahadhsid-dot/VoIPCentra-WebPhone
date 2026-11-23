@@ -23,7 +23,7 @@
 -->
 <html manifest="viciphone.appcache">
 	<head>
-		<title>Vicidial Web Phone</title>
+		<title>VoIPCentra WebPhone</title>
 		<link rel="stylesheet" href="<?php echo $layout; ?>" />
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Expires" content="-1">
