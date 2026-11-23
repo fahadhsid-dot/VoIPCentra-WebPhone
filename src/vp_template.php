@@ -128,34 +128,34 @@
 		var hide_volume = <?php echo json_encode((string) $hide_volume, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 
 		// audio settings
-		var auto_gain = <?php echo json_encode((string) $auto_gain_control, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var echo_can = <?php echo json_encode((string) $echo_cancellation, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var noise_sup = <?php echo json_encode((string) $noise_suppression, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var auto_gain = <?php echo json_encode((string) ($auto_gain_control ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var echo_can = <?php echo json_encode((string) ($echo_cancellation ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var noise_sup = <?php echo json_encode((string) ($noise_suppression ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 
 		// behavior options
 		var auto_answer = <?php echo json_encode((string) $auto_answer, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var dial_reg_exten = <?php echo json_encode((string) $dial_reg_exten, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var dial_reg_exten = <?php echo json_encode((string) ($dial_reg_exten ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 		var reg_exten = <?php echo json_encode((string) $session_id, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var region = <?php echo json_encode((string) $progress_region, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var region = <?php echo json_encode((string) ($progress_region ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 
-		var langAttempting 		= <?php echo json_encode((string) $langAttempting, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langConnected 		= <?php echo json_encode((string) $langConnected, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langDisconnected 		= <?php echo json_encode((string) $langDisconnected, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langExten 			= <?php echo json_encode((string) $langExten, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langIncall 			= <?php echo json_encode((string) $langIncall, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langInit 			= <?php echo json_encode((string) $langInit, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langRedirect 		= <?php echo json_encode((string) $langRedirect, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langRegFailed 		= <?php echo json_encode((string) $langRegFailed, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langRegistering 		= <?php echo json_encode((string) $langRegistering, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langRegistered 		= <?php echo json_encode((string) $langRegistered, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langReject 			= <?php echo json_encode((string) $langReject, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langRinging 		= <?php echo json_encode((string) $langRinging, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langSend 			= <?php echo json_encode((string) $langSend, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langTrying 			= <?php echo json_encode((string) $langTrying, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langUnregFailed 		= <?php echo json_encode((string) $langUnregFailed, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langUnregistered 		= <?php echo json_encode((string) $langUnregistered, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langUnregistering		= <?php echo json_encode((string) $langUnregistering, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
-		var langWebrtcError 		= <?php echo json_encode((string) $langWebrtcError, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langAttempting 		= <?php echo json_encode((string) ($langAttempting ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langConnected 		= <?php echo json_encode((string) ($langConnected ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langDisconnected 		= <?php echo json_encode((string) ($langDisconnected ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langExten 			= <?php echo json_encode((string) ($langExten ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langIncall 			= <?php echo json_encode((string) ($langIncall ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langInit 			= <?php echo json_encode((string) ($langInit ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langRedirect 		= <?php echo json_encode((string) ($langRedirect ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langRegFailed 		= <?php echo json_encode((string) ($langRegFailed ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langRegistering 		= <?php echo json_encode((string) ($langRegistering ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langRegistered 		= <?php echo json_encode((string) ($langRegistered ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langReject 			= <?php echo json_encode((string) ($langReject ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langRinging 		= <?php echo json_encode((string) ($langRinging ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langSend 			= <?php echo json_encode((string) ($langSend ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langTrying 			= <?php echo json_encode((string) ($langTrying ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langUnregFailed 		= <?php echo json_encode((string) ($langUnregFailed ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langUnregistered 		= <?php echo json_encode((string) ($langUnregistered ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langUnregistering		= <?php echo json_encode((string) ($langUnregistering ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+		var langWebrtcError 		= <?php echo json_encode((string) ($langWebrtcError ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 
 
 		</script>

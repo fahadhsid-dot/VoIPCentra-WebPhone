@@ -57,50 +57,41 @@ $server_ip =                base64_decode($server_ip);
 $codecs =                   base64_decode($codecs);
 $options =                  base64_decode($options);
 
-// Encryption check
-// Get remote address
-$referring_url = "https://viciphone.com";
-if (!empty($_SERVER['HTTP_REFERER'])) {
-	$referring_url = $_SERVER['HTTP_REFERER'];
-}
-$ref_url_array = parse_url( $referring_url );
+// HTTPS is validated from trusted server transport metadata above.
+// HTTP_REFERER is optional and is not an authentication or TLS signal.
+if ($debug_access_log) {
+    $referrer = isset($_SERVER['HTTP_REFERER'])
+        ? parse_url((string) $_SERVER['HTTP_REFERER'])
+        : array();
 
-// Do not include 
-// user / pass / port / get / post 
-// data in the URL that is logged or displayed
-$base_referring_url = $ref_url_array['scheme'] . "://" . $ref_url_array['host'] . $ref_url_array['path'];
+    if (!is_array($referrer)) {
+        $referrer = array();
+    }
 
-// Create the debug log string
-$log_string = date("Y-m-d H:i:s");
-$log_string .= "\t";
-if (!empty($_SERVER['REMOTE_ADDR'])) {
-	$log_string .= $_SERVER['REMOTE_ADDR'];
-}
-$log_string .= "\t";
-$log_string .= $base_referring_url;
-$log_string .= "\t";
-if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-	$log_string .= $_SERVER['HTTP_USER_AGENT'];
-}
-$log_string .= "\t";
-$log_string .= get_browser(null,true);
-$log_string .= "\n";
+    $ref_scheme = isset($referrer['scheme'])
+        ? strtolower($referrer['scheme']) : '';
+    $ref_host = isset($referrer['host'])
+        ? $referrer['host'] : '';
+    $ref_path = isset($referrer['path'])
+        ? $referrer['path'] : '';
 
-if ( $debug_access_log ) {
-	// log it
-	file_put_contents( "debug/viciphone_access.log",$log_string,FILE_APPEND );
-}
+    $safe_referrer = ($ref_scheme === 'https' && $ref_host !== '')
+        ? 'https://' . $ref_host . $ref_path
+        : '[unavailable]';
 
-// Encryption Check
-if ( $ref_url_array['scheme'] != 'https' ) {
-        // Remote address is not https
-        // Throw and Alert and exit
-        echo "<script language='javascript'>";
-        echo "alert('Referring URL ( $base_referring_url ) is not encrypted. VICIphone cannot load without encryption. Please make sure you are using the correct URL.')";
-        echo "</script>";
-        exit;
-}
+    $remote_address = isset($_SERVER['REMOTE_ADDR'])
+        ? (string) $_SERVER['REMOTE_ADDR'] : '';
+    $user_agent = isset($_SERVER['HTTP_USER_AGENT'])
+        ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
 
+    $log_string = date('Y-m-d H:i:s') . "\t"
+        . str_replace(array("\r", "\n", "\t"), ' ', $remote_address)
+        . "\t" . $safe_referrer
+        . "\t" . str_replace(array("\r", "\n", "\t"), ' ', $user_agent)
+        . "\n";
+
+    file_put_contents('debug/viciphone_access.log', $log_string, FILE_APPEND);
+}
 
 // whether debug should be enabled
 $debug_enabled = false;
